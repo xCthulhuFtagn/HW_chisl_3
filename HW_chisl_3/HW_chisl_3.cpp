@@ -37,7 +37,6 @@ double Newton(double param, vector<double>* data) {
 		}
 		ans += tmp;
 	}
-	//тут
 	return ans;
 }
 
@@ -73,5 +72,6 @@ int main()
 	for (unsigned i = 0; i < size; ++i) {
 		cout << data[0][i] << "\t|\t" << data[1][i] << "\t|\t" << Newton(data[0][i], data) << endl;
 	}
+	cout << "Bias in 0.1875 is: " << Lagrange(0.1875, data)-Newton(0.1875, data);
 	return 0;
 }
