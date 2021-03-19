@@ -37,6 +37,7 @@ double Newton(double param, vector<double>* data) {
 		}
 		ans += tmp;
 	}
+	//тут
 	return ans;
 }
 
