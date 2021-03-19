@@ -17,6 +17,29 @@ double Lagrange(double param, vector<double>* data) {
 	return LagPol;
 }
 
+double Newton(double param, vector<double>* data) {
+	unsigned size = data[0].size(), i;
+	vector<vector<double>> f(size-1);
+	double ans, tmp;
+	for (i = 0; i < size - 1; ++i) {
+		f[0].push_back((data[1][i + 1] - data[1][i]) / (data[0][i + 1] - data[0][i]));
+	}
+	for (unsigned i = 1; i < size-1; ++i) {
+		for (unsigned j = 0; j < size - i -1; ++j) {
+			f[i].push_back((f[i - 1][j + 1] - f[i - 1][j]) / (data[0][j + i + 1] - data[0][j])); 
+		}
+	}
+	ans = data[1].front();
+	for (unsigned i = 0; i < size-1; ++i) {
+		tmp = f[i].front();
+		for (unsigned j = 0; j <= i; ++j) {
+			tmp *= (param - data[0][j]);
+		}
+		ans += tmp;
+	}
+	return ans;
+}
+
 int main()
 {
 	unsigned n, size;
@@ -39,9 +62,15 @@ int main()
 		return -1;
 	}
 	size = data[0].size();
+	cout << "Lagrange:" << endl;
 	cout << "x\t|\ty\t|\tans" << endl;
 	for (unsigned i = 0; i < size; ++i) {
 		cout << data[0][i] << "\t|\t" << data[1][i] << "\t|\t" << Lagrange(data[0][i], data) << endl;
+	}
+	cout << "Newton:" << endl;
+	cout << "x\t|\ty\t|\tans" << endl;
+	for (unsigned i = 0; i < size; ++i) {
+		cout << data[0][i] << "\t|\t" << data[1][i] << "\t|\t" << Newton(data[0][i], data) << endl;
 	}
 	return 0;
 }
