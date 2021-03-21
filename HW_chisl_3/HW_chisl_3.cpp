@@ -1,7 +1,12 @@
 ﻿#include <vector>
 #include <iostream>
 #include <iomanip>
+#include <valarray>
 using namespace std;
+
+vector<double>& vector<double>::operator=(const vector<double>& right){
+	this->assign(right.front(), right.back());
+}
 
 double Lagrange(double param, vector<double>* data) {
 	double tmp, LagPol = 0;
@@ -40,11 +45,61 @@ double Newton(double param, vector<double>* data) {
 	return ans;
 }
 
+vector<double> Gaus(vector <valarray<double>> a) {
+	unsigned n = a.size();
+	double coef;
+	vector<double> ans;
+	for (unsigned i = 0; i < n; ++i) {
+		unsigned j;
+		for (j = i; j < n && a[j][i] == 0; ++j);
+		if (j == n) {
+			cout << "System has no solution or their quantity is infinity" << endl;
+			exit(0);
+		}
+		else if (i != j)
+			swap(a[j], a[i]);
+		for (j = 0; j < i; ++j) {
+			coef = a[j][i] / a[i][i];
+			a[j] -= a[i] * coef;
+		}
+		for (j = i + 1; j < n; ++j) {
+			coef = a[j][i] / a[i][i];
+			a[j] -= a[i] * coef;
+		}
+	}
+	for (unsigned i = 0; i < n; ++i) {
+		ans.push_back(a[i][n] / a[i][i]);
+	}
+	return ans;
+}
+
+double Spline(double param, vector<double> *input) {
+	if (param <= input[0][0]) throw invalid_argument("can't find Splines for such argument!");
+	vector<double> h, m;
+	double ans;
+	unsigned size = input[0].size(), i;
+	vector<valarray<double>> output(size-2);
+	for (unsigned i = 0; i < size-1; ++i) {
+		h.push_back(input[0][i + 1] - input[0][i]);
+	}
+	for (i = 0; i < size-2; ++i) {
+		output[i].resize(size - 1, 0);
+		output[i][i] = (h[i] + h[i + 1]) / 3;
+		output[i][i + 1] = h[i + 1] / 6;
+		output[i][size-3] = (input[1][i + 2] - input[1][i + 1]) / h[i + 1] - (input[1][i + 1] - input[1][i]) / h[i];
+	}
+	m=Gaus(output);
+	int mm1, mm2;
+	for (i = 0; i < size && input[0][i] < param; ++i);
+	ans=((m[i] * pow((param - input[0][i]), 2) + m[i-1] * pow(input[0][i + 1] - param, 3)) / (h[i] * 6) + (input[1][i + 1] - m[i-1] * pow(h[i], 2) / 6) * ((param - input[0][i]) / h[i]) + (input[1][i] - m[i] * pow(h[i], 2) / 6) * (input[0][i] - param) / h[i]);
+	return ans;
+}
+
 int main()
 {
 	unsigned n, size;
 	double LagPol = 0, x, y, param, tmp;
-	vector<double> data[2];
+	vector<double> data[2], splines;
 	try {
 		cout << "Enter number of input: ";
 		cin >> n;
@@ -72,6 +127,14 @@ int main()
 	for (unsigned i = 0; i < size; ++i) {
 		cout << data[0][i] << "\t|\t" << data[1][i] << "\t|\t" << Newton(data[0][i], data) << endl;
 	}
-	cout << "Bias in 0.1875 is: " << Lagrange(0.1875, data)-Newton(0.1875, data);
+	cout << "Bias in 0.1875 is: " << Lagrange(0.1875, data)-Newton(0.1875, data)<<endl;
+	try {
+		for (unsigned i = 1; i < size-2; ++i) {
+			cout << Spline(data[0][i], data) << "\t";
+		}
+	}
+	catch (invalid_argument& bad) {
+		cout << bad.what();
+	}
 	return 0;
 }
