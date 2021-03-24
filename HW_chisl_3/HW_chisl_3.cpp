@@ -94,7 +94,7 @@ double Spline(double param, vector<double> *input) {
 	output[i+1][size-1] = 1;
 	m=Gaus(output);
 	for (i = 0; i < size && input[0][i] < param; ++i);
-	ans=((m[i] * pow((param - input[0][i-2]), 3) + m[i-1] * pow(input[0][i-1] - param, 3)) / (h[i-1] * 6) + (input[1][i-1] - m[i] * pow(h[i-1], 2) / 6) * ((param - input[0][i-2]) / h[i-1]) + (input[1][i-2] - m[i-1] * pow(h[i-1], 2) / 6) * (input[0][i-1] - param) / h[i-1]);
+	ans=((m[i] * pow((param - input[0][i-1]), 3) + m[i-1] * pow(input[0][i] - param, 3)) / (h[i-1] * 6) + (input[1][i] - m[i] * pow(h[i-1], 2) / 6) * ((param - input[0][i-1]) / h[i-1]) + (input[1][i-1] - m[i-1] * pow(h[i-1], 2) / 6) * (input[0][i] - param) / h[i-1]);
 	return ans;
 }
 
