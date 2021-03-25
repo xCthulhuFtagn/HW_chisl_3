@@ -94,9 +94,79 @@ double Spline(double param, vector<double> *input) {
 	output[i+1][size-1] = 1;
 	m=Gaus(output);
 	for (i = 0; i < size && input[0][i] < param; ++i);
-	ans=((m[i] * pow((param - input[0][i-1]), 3) + m[i-1] * pow(input[0][i] - param, 3)) / (h[i-1] * 6) + (input[1][i] - m[i] * pow(h[i-1], 2) / 6) * ((param - input[0][i-1]) / h[i-1]) + (input[1][i-1] - m[i-1] * pow(h[i-1], 2) / 6) * (input[0][i] - param) / h[i-1]);
+	ans=((m[i] * pow((param - input[0][i-1]), 3) + m[i-1] * 
+		pow(input[0][i] - param, 3)) / (h[i-1] * 6) + (input[1][i] - m[i] * pow(h[i-1], 2) / 6) * ((param - input[0][i-1]) / h[i-1]) + (input[1][i-1] - m[i-1] * pow(h[i-1], 2) / 6) * (input[0][i] - param) / h[i-1]);
 	return ans;
 }
+
+vector<double> SquareAproximation(vector<double>* data) {
+	unsigned size = data[0].size();
+	vector<valarray<double>> suem(3);
+	vector<double> koef(7, 0), ans;
+	for (unsigned i = 0; i < 7; ++i) {
+		if (i < 4) {
+			for (unsigned j = 0; j < size; ++j) {
+				koef[i] += pow(data[0][j], i + 1);//иксы
+			}
+		}
+		else {
+			for (unsigned j = 0; j < size; ++j) {
+				koef[i] += data[1][j] * pow(data[0][j], i - 4);//игреки
+			}
+		}
+	}
+	for (unsigned i = 0; i < 3; ++i) {
+		suem[i].resize(4);
+		for (unsigned j = 0; j < 3; ++j) {
+			if (i != 2 || j != 2) {
+				suem[i][j] = koef[3 - j - i];
+			}
+			else {
+				suem[i][j] = size;
+			}
+		}
+		suem[i][3] = koef[6 - i];
+	}
+	return Gaus(suem);
+}
+
+double SquareFunc(double a, double b, double c, double x) {
+	return a * pow(x, 2) + b * x + c;
+}
+
+/*
+void Linear_approximation(double** tab, unsigned size)
+{
+	double x = 0, x2 = 0, y = 0, xy = 0;
+	for (int i = 0; i < size; i++)
+	{
+		x += tab[0][i];
+		x2 += tab[0][i] * tab[0][i];
+		y += tab[1][i];
+		xy += tab[0][i] * tab[1][i];
+	}
+
+	double **syst = new double* [2];
+	for (int i = 0; i < size; i++)
+		*syst = new double [3];
+
+	syst[0][0] = x2;
+	syst[0][1] = x;
+	syst[0][2] = xy;
+	syst[1][0] = x;
+	syst[1][1] = size;
+	syst[1][2] = y;
+
+	double *ans = gauss(syst, 2);
+
+	double Discrepancy = 1;
+
+/*	for (int i = 1; i <= size; i++)
+		Discrepancy += pow(ans[0] * i + ans[1] - syst[i][2], 2);	*/
+
+		//P(x) = bx+c
+}
+*/
 
 int main()
 {
