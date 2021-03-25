@@ -161,8 +161,8 @@ void Linear_approximation(double** tab, unsigned size)
 
 	double Discrepancy = 1;
 
-/*	for (int i = 1; i <= size; i++)
-		Discrepancy += pow(ans[0] * i + ans[1] - syst[i][2], 2);	*/
+	for (int i = 1; i <= size; i++)
+		Discrepancy += pow(ans[0] * i + ans[1] - syst[i][2], 2);	
 
 		//P(x) = bx+c
 }
