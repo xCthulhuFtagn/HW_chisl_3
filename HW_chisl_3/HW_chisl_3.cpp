@@ -2,10 +2,21 @@
 #include <iostream>
 #include <iomanip>
 #include <valarray>
+#include <math.h>
+#include <exception>
 using namespace std;
 
 vector<double>& vector<double>::operator=(const vector<double>& right){
 	this->assign(right.front(), right.back());
+}
+void operator-=(vector<double>& left, const vector<double>& right) {
+	if (left.size() != right.size()) throw exception("Differently sized vectors!");
+	else {
+
+	}
+}
+vector<double> operator*(const vector<double>& left, const double right) {
+	return ans;
 }
 
 double Lagrange(double param, vector<double>* data) {
@@ -45,7 +56,7 @@ double Newton(double param, vector<double>* data) {
 	return ans;
 }
 
-vector<double> Gaus(vector <valarray<double>> a) {
+vector<double> Gaus(vector <vector<double>> a) {
 	unsigned n = a.size();
 	double coef;
 	vector<double> ans;
@@ -102,7 +113,7 @@ double Spline(double param, vector<double> *input) {
 vector<double> SquareAproximation(vector<double>* data) {
 	unsigned size = data[0].size();
 	vector<valarray<double>> suem(3);
-	vector<double> koef(7, 0), ans;
+	vector<double> koef(7, 0);
 	for (unsigned i = 0; i < 7; ++i) {
 		if (i < 4) {
 			for (unsigned j = 0; j < size; ++j) {
@@ -134,39 +145,40 @@ double SquareFunc(double a, double b, double c, double x) {
 	return a * pow(x, 2) + b * x + c;
 }
 
-/*
-void Linear_approximation(double** tab, unsigned size)
+
+void Linear_approximation(vector<double>* data)
 {
-	double x = 0, x2 = 0, y = 0, xy = 0;
-	for (int i = 0; i < size; i++)
-	{
-		x += tab[0][i];
-		x2 += tab[0][i] * tab[0][i];
-		y += tab[1][i];
-		xy += tab[0][i] * tab[1][i];
+	unsigned size = data[0].size();
+	vector<valarray<double>> suem(2);
+	vector<double> koef(4, 0), ans;
+	//double x = 0, x2 = 0, y = 0, xy = 0;
+	for (int i = 0; i < 4; i++){
+		koef[0] += data[0][i];
+		koef[1] += pow(data[0][i],2);
+		koef[2] += data[1][i];
+		koef[3] += data[0][i] * data[1][i];
 	}
 
 	double **syst = new double* [2];
 	for (int i = 0; i < size; i++)
 		*syst = new double [3];
 
-	syst[0][0] = x2;
-	syst[0][1] = x;
-	syst[0][2] = xy;
-	syst[1][0] = x;
+	syst[0][0] = koef[1];
+	syst[0][1] = koef[0];
+	syst[0][2] = koef[3];
+	syst[1][0] = koef[1];
 	syst[1][1] = size;
-	syst[1][2] = y;
+	syst[1][2] = koef[2];
 
-	double *ans = gauss(syst, 2);
+	double *ans = Gaus(syst);
 
-	double Discrepancy = 1;
+	double Discrepancy = 0;
 
 	for (int i = 1; i <= size; i++)
 		Discrepancy += pow(ans[0] * i + ans[1] - syst[i][2], 2);	
 
 		//P(x) = bx+c
 }
-*/
 
 int main()
 {
