@@ -6,16 +6,23 @@
 #include <exception>
 using namespace std;
 
-vector<double>& vector<double>::operator=(const vector<double>& right){
+vector<double>& vector<double>::operator=(const vector<double>& right) {
 	this->assign(right.front(), right.back());
 }
 void operator-=(vector<double>& left, const vector<double>& right) {
 	if (left.size() != right.size()) throw exception("Differently sized vectors!");
 	else {
-
+		unsigned size = left.size();
+		for (auto i = 0; i < size; ++i) {
+			left[i] -= right[i];
+		}
 	}
 }
 vector<double> operator*(const vector<double>& left, const double right) {
+	vector<double> ans;
+	for (auto el : left) {
+		ans.push_back(el * right);
+	}
 	return ans;
 }
 
@@ -35,18 +42,18 @@ double Lagrange(double param, vector<double>* data) {
 
 double Newton(double param, vector<double>* data) {
 	unsigned size = data[0].size(), i;
-	vector<vector<double>> f(size-1);
+	vector<vector<double>> f(size - 1);
 	double ans, tmp;
 	for (i = 0; i < size - 1; ++i) {
 		f[0].push_back((data[1][i + 1] - data[1][i]) / (data[0][i + 1] - data[0][i]));
 	}
-	for (unsigned i = 1; i < size-1; ++i) {
-		for (unsigned j = 0; j < size - i -1; ++j) {
-			f[i].push_back((f[i - 1][j + 1] - f[i - 1][j]) / (data[0][j + i + 1] - data[0][j])); 
+	for (unsigned i = 1; i < size - 1; ++i) {
+		for (unsigned j = 0; j < size - i - 1; ++j) {
+			f[i].push_back((f[i - 1][j + 1] - f[i - 1][j]) / (data[0][j + i + 1] - data[0][j]));
 		}
 	}
 	ans = data[1].front();
-	for (unsigned i = 0; i < size-1; ++i) {
+	for (unsigned i = 0; i < size - 1; ++i) {
 		tmp = f[i].front();
 		for (unsigned j = 0; j <= i; ++j) {
 			tmp *= (param - data[0][j]);
@@ -84,35 +91,35 @@ vector<double> Gaus(vector <vector<double>> a) {
 	return ans;
 }
 
-double Spline(double param, vector<double> *input) {
+double Spline(double param, vector<double>* input) {
 	if (param <= input[0][0]) throw invalid_argument("can't find Splines for such argument!");
 	vector<double> h, m;
 	double ans;
 	unsigned size = input[0].size(), i;
-	vector<valarray<double>> output(size);
-	for (unsigned i = 0; i < size-1; ++i) {
+	vector<vector<double>> output(size);
+	for (unsigned i = 0; i < size - 1; ++i) {
 		h.push_back(input[0][i + 1] - input[0][i]);
 	}
-	for (i = 0; i < size-2; ++i) {
-		output[i].resize(size + 1, 0);
+	for (i = 0; i < size - 2; ++i) {
+		output[i].assign(size + 1, 0);
 		output[i][i + 1] = (h[i] + h[i + 1]) / 3;
 		output[i][i + 2] = h[i + 1] / 6;
 		output[i][size] = (input[1][i + 2] - input[1][i + 1]) / h[i + 1] - (input[1][i + 1] - input[1][i]) / h[i];
 	}
-	output[i].resize(size + 1, 0);
+	output[i].assign(size + 1, 0);
 	output[i][0] = 1;
-	output[i+1].resize(size + 1, 0);
-	output[i+1][size-1] = 1;
-	m=Gaus(output);
+	output[i + 1].assign(size + 1, 0);
+	output[i + 1][size - 1] = 1;
+	m = Gaus(output);
 	for (i = 0; i < size && input[0][i] < param; ++i);
-	ans=((m[i] * pow((param - input[0][i-1]), 3) + m[i-1] * 
-		pow(input[0][i] - param, 3)) / (h[i-1] * 6) + (input[1][i] - m[i] * pow(h[i-1], 2) / 6) * ((param - input[0][i-1]) / h[i-1]) + (input[1][i-1] - m[i-1] * pow(h[i-1], 2) / 6) * (input[0][i] - param) / h[i-1]);
+	ans = ((m[i] * pow((param - input[0][i - 1]), 3) + m[i - 1] *
+		pow(input[0][i] - param, 3)) / (h[i - 1] * 6) + (input[1][i] - m[i] * pow(h[i - 1], 2) / 6) * ((param - input[0][i - 1]) / h[i - 1]) + (input[1][i - 1] - m[i - 1] * pow(h[i - 1], 2) / 6) * (input[0][i] - param) / h[i - 1]);
 	return ans;
 }
 
 vector<double> SquareAproximation(vector<double>* data) {
 	unsigned size = data[0].size();
-	vector<valarray<double>> suem(3);
+	vector<vector<double>> suem(3);
 	vector<double> koef(7, 0);
 	for (unsigned i = 0; i < 7; ++i) {
 		if (i < 4) {
@@ -146,22 +153,19 @@ double SquareFunc(double a, double b, double c, double x) {
 }
 
 
-void Linear_approximation(vector<double>* data)
+vector<double> Linear_approximation(vector<double>* data)
 {
 	unsigned size = data[0].size();
-	vector<valarray<double>> suem(2);
 	vector<double> koef(4, 0), ans;
 	//double x = 0, x2 = 0, y = 0, xy = 0;
-	for (int i = 0; i < 4; i++){
+	for (int i = 0; i < 4; i++) {
 		koef[0] += data[0][i];
-		koef[1] += pow(data[0][i],2);
+		koef[1] += pow(data[0][i], 2);
 		koef[2] += data[1][i];
 		koef[3] += data[0][i] * data[1][i];
 	}
-
-	double **syst = new double* [2];
-	for (int i = 0; i < size; i++)
-		*syst = new double [3];
+	vector<vector<double>> syst(2);
+	for (auto& el : syst) el.resize(3);
 
 	syst[0][0] = koef[1];
 	syst[0][1] = koef[0];
@@ -170,14 +174,13 @@ void Linear_approximation(vector<double>* data)
 	syst[1][1] = size;
 	syst[1][2] = koef[2];
 
-	double *ans = Gaus(syst);
+	ans = Gaus(syst);
 
 	double Discrepancy = 0;
 
 	for (int i = 1; i <= size; i++)
-		Discrepancy += pow(ans[0] * i + ans[1] - syst[i][2], 2);	
+		Discrepancy += pow(ans[0] * i + ans[1] - syst[i][2], 2);
 
-		//P(x) = bx+c
 }
 
 int main()
@@ -221,3 +224,4 @@ int main()
 	}
 	return 0;
 }
+
