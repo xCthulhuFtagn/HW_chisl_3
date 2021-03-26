@@ -152,6 +152,9 @@ double SquareFunc(double a, double b, double c, double x) {
 	return a * pow(x, 2) + b * x + c;
 }
 
+double LinFunc(double k, double b, double x) {
+	return k*x + b;
+}
 
 vector<double> Linear_approximation(vector<double>* data)
 {
@@ -173,14 +176,12 @@ vector<double> Linear_approximation(vector<double>* data)
 	syst[1][0] = koef[1];
 	syst[1][1] = size;
 	syst[1][2] = koef[2];
-
-	ans = Gaus(syst);
-
+	return Gaus(syst);
+	//тут надо еще посмотреть
 	double Discrepancy = 0;
-
-	for (int i = 1; i <= size; i++)
+	for (int i = 1; i <= size; i++) {
 		Discrepancy += pow(ans[0] * i + ans[1] - syst[i][2], 2);
-
+	}
 }
 
 int main()
