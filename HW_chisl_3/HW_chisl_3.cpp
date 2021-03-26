@@ -186,8 +186,6 @@ double LinearApproximation(valarray<double>* data, double x)
 }
 
 void Draw(valarray<double>* data, double(*f)(valarray<double>*, double)) {
-	Sleep(1000);
-	printf("\033[2J");
 	double x_max, x_min, diap_x;
 	double y_max, y_min, diap_y;
 	double y, x;
@@ -200,7 +198,8 @@ void Draw(valarray<double>* data, double(*f)(valarray<double>*, double)) {
 	HPEN Pen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));     //ручка для разметки 
 	HPEN Pen1 = CreatePen(PS_SOLID, 2, RGB(0, 255, 0));        //ручка для графика 
 	HPEN Pen2 = CreatePen(PS_SOLID, 8, RGB(255, 0, 0));        //ручка для точек
-	if (true) {
+	cout << "\033[2J\033[1;1H";
+	while (true) {
 		HWND hwnd = GetConsoleWindow();
 		RECT rect;
 		//через прямоугольник rect описывается консолька 
@@ -269,7 +268,7 @@ int main()
 		}
 		cout << "Choose what you want to see:\nInterpolation by\n1)Newton\n2)Lagrange\n3)Splines\nApproximations :\n4)Quadratic\n5)Linear\n";
 		cin >> n;
-		if (!cin || n <= 0 || n > 4) throw invalid_argument("Wrong number entered while choosing what to see");
+		if (!cin || n <= 0 || n > 5) throw invalid_argument("Wrong number entered while choosing what to see");
 		else {
 			switch (n) {
 			case 1:
@@ -277,8 +276,10 @@ int main()
 			case 2:
 				Draw(data, Lagrange);
 			case 3:
-				Draw(data, SquareAproximation);
+				Draw(data, Spline);
 			case 4:
+				Draw(data, SquareAproximation);
+			case 5:
 				Draw(data, LinearApproximation);
 			}
 		}
@@ -290,3 +291,17 @@ int main()
 	return 0;
 }
 
+/*
+11
+0 1.2
+0.12 1.0
+0.19 1.3
+0.35 2.1
+0.4 1.6
+0.45 2.6
+0.62 3.6
+0.71 4.5
+0.84 5.5
+0.91 5.5
+1.0 7.1
+*/
