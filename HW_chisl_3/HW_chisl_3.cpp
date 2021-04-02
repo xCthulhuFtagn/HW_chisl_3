@@ -7,22 +7,10 @@
 #include <algorithm>
 #include <windows.h>
 #include <conio.h>
+
 #undef min
 #undef max
 using namespace std;
-/*
-vector<double>& vector<double>::operator=(const vector<double>& right) {
-	this->assign(right.front(), right.back());
-}
-void operator-=(vector<double>& left, const vector<double>& right) {
-	if (left.size() != right.size()) throw exception("Differently sized vectors!");
-	else {
-		unsigned size = left.size();
-		for (auto i = 0; i < size; ++i) {
-			left[i] -= right[i];
-		}
-	}
-}*/
 
 vector<double> operator*(const vector<double>& left, const double right) {
 	vector<double> ans;
@@ -67,6 +55,27 @@ double Newton(valarray<double>* data, double param) {
 		ans += tmp;
 	}
 	return ans;
+}
+
+void NewtonPolinom(valarray<double>* data, double param) {
+	unsigned size = data[0].size();
+	vector<vector<double>> f(size - 1);
+	for (unsigned i = 0; i < size - 1; ++i) {
+		f[0].push_back((data[1][i + 1] - data[1][i]) / (data[0][i + 1] - data[0][i]));
+	}
+	for (unsigned i = 1; i < size - 1; ++i) {
+		for (unsigned j = 0; j < size - i - 1; ++j) {
+			f[i].push_back((f[i - 1][j + 1] - f[i - 1][j]) / (data[0][j + i + 1] - data[0][j]));
+		}
+	}
+	cout << "N(" << param << ") = " << data[1][0];
+	for (unsigned i = 0; i < size - 2; ++i) {
+		cout << " + (" << f[i][i]<<")";
+		for (unsigned j = 0; j < i; ++j) {
+			cout << "*(" << param << " - " << data[0][j] << ")";
+		}
+	}
+	cout << endl << endl << endl;
 }
 
 valarray<double> Gaus(vector <valarray<double>> a) {
@@ -200,6 +209,7 @@ void Draw(valarray<double>* data, double(*f)(valarray<double>*, double)) {
 	HPEN Pen2 = CreatePen(PS_SOLID, 8, RGB(255, 0, 0));        //ручка для точек
 	cout << "\033[2J\033[1;1H";
 	while (true) {
+		//system("CLS");
 		HWND hwnd = GetConsoleWindow();
 		RECT rect;
 		//через прямоугольник rect описывается консолька 
@@ -228,7 +238,7 @@ void Draw(valarray<double>* data, double(*f)(valarray<double>*, double)) {
 			LineTo(hDC, width * (x - x_min) / (x_max - x_min), height / 2 + height / 250 + 1);
 		}
 		//деления oY
-		for (y = y_min; y < y_max + diap_y; y += diap_y) {
+		for (y = y_min ; y < y_max ; y += diap_y) {
 			MoveToEx(hDC, width / 2 - width / 250 - 1, height * (y_max - y) / (y_max - y_min), NULL);
 			LineTo(hDC, width / 2 + width / 250 + 1, height * (y_max - y) / (y_max - y_min));
 		}
@@ -250,7 +260,7 @@ void Draw(valarray<double>* data, double(*f)(valarray<double>*, double)) {
 
 int main()
 {
-	unsigned n, size;
+	unsigned n, choice;
 	double LagPol = 0, x, y, param, tmp;
 	valarray<double> data[2], splines;
 	try {
@@ -267,13 +277,49 @@ int main()
 			data[1][i]=(y);
 		}
 		cout << "Choose what you want to see:\nInterpolation by\n1)Newton\n2)Lagrange\n3)Splines\nApproximations :\n4)Quadratic\n5)Linear\n";
-		cin >> n;
-		if (!cin || n <= 0 || n > 5) throw invalid_argument("Wrong number entered while choosing what to see");
+		cin >> choice;
+		if (!cin || choice <= 0 || choice > 5) throw invalid_argument("Wrong number entered while choosing what to see");
 		else {
-			switch (n) {
+			switch (choice) {
 			case 1:
+				for (unsigned i = 0; i < n; ++i) {
+					NewtonPolinom(data, data[0][i]);
+				}
+				Sleep(100);
 				Draw(data, Newton);
 			case 2:
+				for (unsigned i = 0; i < n; ++i) {
+					cout << "L(" << data[0][i] << ") = ";
+					for (unsigned j = 0; j < n; ++j) {
+						cout << "(" << data[1][j] << ")";
+						for (unsigned k = 0; k < n; ++k) {
+							cout << "*(";
+							if (data[0][i] == data[0][k]) {
+								cout << "1";
+							}
+							else {
+								cout << data[0][k] << " - " << data[0][i];
+							}
+							cout << ")";
+						}
+						cout << "/(";
+						for (unsigned k = 0; k < n; ++k) {
+							if (k != 0) cout << "*";
+							cout << "(";
+							if (data[0][i] == data[0][k]) {
+								cout << "1";
+							}
+							else {
+								cout << data[0][j] << " - " << data[0][k];
+							}
+							cout << ")";
+						}
+						cout << ")";
+						if(j!=n-1) cout << " + ";
+					}
+					cout << endl<<endl<<endl;
+				}
+				Sleep(10000);
 				Draw(data, Lagrange);
 			case 3:
 				Draw(data, Spline);
