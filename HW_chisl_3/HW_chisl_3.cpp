@@ -151,7 +151,7 @@ void PrintSpline(valarray<double>* input) {
 	output[i + 1].resize(size + 1, 0);
 	output[i + 1][size - 1] = 1;
 	m = Gaus(output);
-	for (unsigned i = 1; i < size - 2; ++i) {
+	for (unsigned i = 1; i < size - 1; ++i) {
 		cout << "S(x) = " << m[i]/(6*h[i-1]) << "*(x - " << input[0][i - 1] << ")^3 + " << m[i] / (h[i - 1] * 6) << "*(" << input[0][i] << "- x)^3" << " + (" << input[1][i]/h[i-1] - m[i] * h[i-1] / 6 << ")*((x - " << input[0][i - 1] << ")) + (" << (input[1][i - 1]/h[i-1] - m[i - 1] * h[i - 1] / 6) << ")*(" << input[0][i] << " - x)" << endl;
 	}
 }
